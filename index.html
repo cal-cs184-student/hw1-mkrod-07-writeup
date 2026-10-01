@@ -53,6 +53,51 @@
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
+		<h3>Algorithm Walkthrough</h3>
+		<ol>
+            <li>
+                <b>Bounding Box Calculation:</b> Given three vertex coordinates \((x_0, y_0)\), \((x_1, y_1)\), and \((x_2, y_2)\), 
+                I first compute the minimum and maximum $x$ and $y$ bounds. I use <code>std::floor</code> and <code>std::ceil</code> to snap the float coordinates 
+                to integer pixel indices, establishing a tight axis-aligned bounding box around the triangle.
+            </li>
+            <li>
+                <b>Pixel Loop & Center Sampling:</b> I iterate through every integer pixel position \((x, y)\) inside the bounding box. 
+                As specified, sample points are evaluated at the pixel center: \((x + 0.5, y + 0.5)\).
+            </li>
+            <li>
+                <b>Line Function Evaluation:</b> For each center sample, I evaluate the three implicit edge/line functions:
+                \[ L_i(x, y) = -(x - x_i)(y_{i+1} - y_i) + (y - y_i)(x_{i+1} - x_i) \]
+            </li>
+            <li>
+                <b>Winding Order & Inside Test:</b> To handle both counter-clockwise (CCW) and clockwise (CW) vertex orderings, I check whether all three edge functions 
+                are concurrently non-negative (\(L_0 \ge 0 \land L_1 \ge 0 \land L_2 \ge 0\)) OR non-positive (\(L_0 \le 0 \land L_1 \le 0 \land L_2 \le 0\)).
+            </li>
+            <li>
+                <b>Pixel Filling:</b> If the sample passes the test (including lying directly on a boundary edge), I call <code>fill_pixel(x, y, color)</code> to rasterize the pixel.
+            </li>
+        </ol>
+
+        <h3>Algorithm Efficiency</h3>
+        <p>
+            My implementation is <b>no worse than an algorithm that checks each sample within the bounding box</b> because the iteration bounds 
+            (<code>min_x</code> to <code>max_x</code> and <code>min_y</code> to <code>max_y</code>) are constructed explicitly from the minimum and maximum coordinates of the triangle's vertices. 
+            Rather than checking every pixel across the entire screen framebuffer (which scales with total display resolution), the nested loops strictly visit pixels within 
+            \([\lfloor \min(x_i) \rfloor, \lceil \max(x_i) \rceil] \times [\lfloor \min(y_i) \rfloor, \lceil \max(y_i) \rceil]\). 
+            Thus, the total number of tested samples scales directly with the bounding area of the triangle itself.
+        </p>
+
+        <h3>Rasterization Result (test4.svg)</h3>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <table style="width: 100%; text-align: center; border-collapse: collapse;">
+              <tr>
+                <td style="text-align: center;">
+                  <img src="assets/test4_screenshot.png" width="500px" alt="test4.svg rasterization result"/>
+                  <figcaption><b>Figure 1:</b> <code>basic/test4.svg</code> rasterized with pixel inspector centered on a sharp triangle edge.</figcaption>
+                </td>
+              </tr>
+            </table>
+        </div>
+
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
